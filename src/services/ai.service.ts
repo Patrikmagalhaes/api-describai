@@ -78,6 +78,6 @@ Avoid assumptions.
             },
         ],
     });
-
+    fs.unlinkSync(filePath);
     return response.text;
 }

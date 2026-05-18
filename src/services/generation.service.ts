@@ -41,6 +41,6 @@ export async function generateAltService({
     tone,
     size,
   });
-
+ 
   return generation;
 }

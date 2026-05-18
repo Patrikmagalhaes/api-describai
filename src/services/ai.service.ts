@@ -5,6 +5,8 @@ import ai from "../lib/gemini";
 type GenerateAltAIParams = {
     filePath: string;
 
+    mimeType: string;
+
     language: string;
     tone: string;
     size: string;
@@ -47,8 +49,12 @@ ${toneMap[tone as keyof typeof toneMap]}
 
 ${sizeMap[size as keyof typeof sizeMap]}
 
-Describe only visible elements.
-Avoid assumptions.
+Rules:
+- Describe only visible elements
+- Do not make assumptions
+- Focus on accessibility
+- Avoid phrases like "image of"
+- Keep the description natural
 `;
 
     const imageBuffer = fs.readFileSync(filePath);
@@ -78,6 +84,6 @@ Avoid assumptions.
             },
         ],
     });
-    fs.unlinkSync(filePath);
+
     return response.text;
 }

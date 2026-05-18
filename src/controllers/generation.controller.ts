@@ -20,6 +20,8 @@ export async function generate(
     const result = await generateAltService({
       filePath: file.path,
 
+      mimeType: file.mimetype,
+
       language,
       tone,
       size,

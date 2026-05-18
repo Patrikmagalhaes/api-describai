@@ -1,6 +1,13 @@
 import multer from "multer";
 import path from "path";
 
+const allowedMimeTypes = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+];
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -16,6 +23,24 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+
+  fileFilter: (req, file, cb) => {
+    if (
+      allowedMimeTypes.includes(file.mimetype)
+    ) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only PNG, JPG and WEBP are allowed."
+        )
+      );
+    }
+  },
 });
 
 export default upload;

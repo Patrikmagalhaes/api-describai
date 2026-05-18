@@ -15,8 +15,14 @@ export async function generate(
       });
     }
 
+    const { language, tone, size } = req.body;
+
     const result = await generateAltService({
       filePath: file.path,
+
+      language,
+      tone,
+      size,
     });
 
     return res.json(result);

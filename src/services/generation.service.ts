@@ -1,27 +1,45 @@
 import { uploadImage } from "./upload.service";
 
+import { generateAltWithAI } from "./ai.service";
+
 import { createGeneration } from "../repositories/generation.repository";
 
 type GenerateAltRequest = {
   filePath: string;
+  language: string;
+  tone: string;
+  size: string;
 };
 
 export async function generateAltService({
   filePath,
+  language,
+  tone,
+  size,
 }: GenerateAltRequest) {
+
+
+
+
   // upload cloudinary
   const imageUrl = await uploadImage(filePath);
 
-  // fake alt temporário
-  const fakeAlt =
-    "Pessoa utilizando notebook em uma mesa.";
+  // IA Gemini
+  const altText = await generateAltWithAI({
+    filePath,
+    language,
+    tone,
+    size,
+  });
 
   const generation = await createGeneration({
     imageUrl,
-    altText: fakeAlt,
-    language: "pt-BR",
-    tone: "natural",
-    size: "medium",
+
+    altText: altText || "",
+
+    language,
+    tone,
+    size,
   });
 
   return generation;

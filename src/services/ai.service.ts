@@ -12,8 +12,21 @@ type GenerateAltAIParams = {
     size: string;
 };
 
+export type AIResult = {
+    altText: string;
+
+    caption: string;
+
+    seoDescription: string;
+
+    html: string;
+
+    keywords: string[];
+};
+
 export async function generateAltWithAI({
     filePath,
+    mimeType,
     language,
     tone,
     size,
@@ -41,7 +54,7 @@ export async function generateAltWithAI({
     };
 
     const prompt = `
-Generate an ALT description for accessibility purposes.
+Generate image accessibility and SEO metadata.
 
 Language: ${language}
 
@@ -49,12 +62,26 @@ ${toneMap[tone as keyof typeof toneMap]}
 
 ${sizeMap[size as keyof typeof sizeMap]}
 
+Return ONLY valid JSON.
+
+Format:
+{
+  "altText": "",
+  "caption": "",
+  "seoDescription": "",
+  "keywords": [],
+  "html": ""
+}
+
 Rules:
-- Describe only visible elements
-- Do not make assumptions
-- Focus on accessibility
-- Avoid phrases like "image of"
-- Keep the description natural
+- altText must focus on accessibility
+- caption should be natural and engaging
+- seoDescription should be optimized for search engines
+- keywords must be short and relevant
+- html must contain a valid img tag
+- Do not use markdown
+- Do not wrap in backticks
+- Return only raw JSON
 `;
 
     const imageBuffer = fs.readFileSync(filePath);
@@ -85,5 +112,18 @@ Rules:
         ],
     });
 
-    return response.text;
+    const text = response.text;
+
+    if (!text) {
+        throw new Error("Empty AI response");
+    }
+
+    const cleanText = text
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    const parsed = JSON.parse(cleanText);
+
+    return parsed as AIResult;
 }

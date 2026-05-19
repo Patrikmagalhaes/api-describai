@@ -26,8 +26,9 @@ export async function generate(
       tone,
       size,
     });
-
+   console.log(result);
     return res.json(result);
+     
   } catch (error) {
     console.log(error);
 

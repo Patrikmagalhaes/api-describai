@@ -8,14 +8,25 @@ datasource db {
 }
 
 model Generation {
-  id          String   @id @default(cuid())
+  id              String   @id @default(cuid())
 
-  imageUrl    String
-  altText     String
+  imageUrl        String
 
-  language    String
-  tone        String
-  size        String
+  altText         String
 
-  createdAt   DateTime @default(now())
+  caption         String
+
+  seoDescription  String
+
+  html            String
+
+  keywords        Json
+
+  language        String
+
+  tone            String
+
+  size            String
+
+  createdAt       DateTime @default(now())
 }

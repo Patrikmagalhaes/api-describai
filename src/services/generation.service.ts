@@ -1,6 +1,9 @@
 import fs from "fs";
+
 import { uploadImage } from "./upload.service";
+
 import { generateAltWithAI } from "./ai.service";
+
 import { createGeneration } from "../repositories/generation.repository";
 
 type GenerateAltRequest = {
@@ -9,7 +12,9 @@ type GenerateAltRequest = {
   mimeType: string;
 
   language: string;
+
   tone: string;
+
   size: string;
 };
 
@@ -22,7 +27,7 @@ export async function generateAltService({
 }: GenerateAltRequest) {
   try {
     // 1. IA
-    const altText =
+    const aiResult =
       await generateAltWithAI({
         filePath,
         mimeType,
@@ -31,7 +36,7 @@ export async function generateAltService({
         size,
       });
 
-    if (!altText) {
+    if (!aiResult?.altText) {
       throw new Error(
         "Failed generating ALT description"
       );
@@ -46,7 +51,16 @@ export async function generateAltService({
       await createGeneration({
         imageUrl,
 
-        altText,
+        altText: aiResult.altText,
+
+        caption: aiResult.caption,
+
+        seoDescription:
+          aiResult.seoDescription,
+
+        html: aiResult.html,
+
+        keywords: aiResult.keywords,
 
         language,
         tone,

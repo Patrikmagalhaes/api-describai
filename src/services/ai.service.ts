@@ -1,5 +1,3 @@
-import fs from "fs";
-
 import ai from "../lib/gemini";
 
 type GenerateAltAIParams = {
@@ -84,11 +82,10 @@ Rules:
 - Return only raw JSON
 `;
 
-    const imageBuffer = fs.readFileSync(buffer);
+
 
     const base64Image =
-        imageBuffer.toString("base64");
-
+        buffer.toString("base64");
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
 
@@ -103,7 +100,7 @@ Rules:
 
                     {
                         inlineData: {
-                            mimeType: "image/png",
+                            mimeType,
                             data: base64Image,
                         },
                     },

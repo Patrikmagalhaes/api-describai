@@ -6,7 +6,11 @@ import generationRoutes from "./routes/generation.routes";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://describai-frontend.vercel.app'
+    ]
+}));
 app.use(express.json());
 
 app.use("/test", testRoutes);

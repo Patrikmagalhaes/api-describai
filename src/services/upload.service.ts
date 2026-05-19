@@ -1,12 +1,26 @@
 import cloudinary from "../lib/cloudinary";
 
 export async function uploadImage(
-  filePath: string
-) {
-  const response =
-    await cloudinary.uploader.upload(filePath, {
-      folder: "describeai",
-    });
+  buffer: Buffer
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const stream =
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "describeai",
+        },
 
-  return response.secure_url;
+        (error, result) => {
+          if (error || !result) {
+            reject(error);
+
+            return;
+          }
+
+          resolve(result.secure_url);
+        }
+      );
+
+    stream.end(buffer);
+  });
 }

@@ -1,5 +1,3 @@
-import fs from "fs";
-
 import { uploadImage } from "./upload.service";
 
 import { generateAltWithAI } from "./ai.service";
@@ -7,7 +5,7 @@ import { generateAltWithAI } from "./ai.service";
 import { createGeneration } from "../repositories/generation.repository";
 
 type GenerateAltRequest = {
-  filePath: string;
+buffer: Buffer;
 
   mimeType: string;
 
@@ -19,7 +17,7 @@ type GenerateAltRequest = {
 };
 
 export async function generateAltService({
-  filePath,
+  buffer,
   mimeType,
   language,
   tone,
@@ -29,7 +27,7 @@ export async function generateAltService({
     // 1. IA
     const aiResult =
       await generateAltWithAI({
-        filePath,
+        buffer,
         mimeType,
         language,
         tone,
@@ -44,7 +42,7 @@ export async function generateAltService({
 
     // 2. upload cloudinary
     const imageUrl =
-      await uploadImage(filePath);
+      await uploadImage(buffer);
 
     // 3. save db
     const generation =
@@ -74,10 +72,5 @@ export async function generateAltService({
     throw new Error(
       "Error generating description"
     );
-  } finally {
-    // cleanup local
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
   }
 }

@@ -3,7 +3,7 @@ import fs from "fs";
 import ai from "../lib/gemini";
 
 type GenerateAltAIParams = {
-    filePath: string;
+    buffer: Buffer
 
     mimeType: string;
 
@@ -25,7 +25,7 @@ export type AIResult = {
 };
 
 export async function generateAltWithAI({
-    filePath,
+    buffer,
     mimeType,
     language,
     tone,
@@ -84,7 +84,7 @@ Rules:
 - Return only raw JSON
 `;
 
-    const imageBuffer = fs.readFileSync(filePath);
+    const imageBuffer = fs.readFileSync(buffer);
 
     const base64Image =
         imageBuffer.toString("base64");

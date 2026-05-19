@@ -18,7 +18,7 @@ export async function generate(
     const { language, tone, size } = req.body;
 
     const result = await generateAltService({
-      filePath: file.path,
+      buffer: file.buffer,
 
       mimeType: file.mimetype,
 
@@ -26,9 +26,9 @@ export async function generate(
       tone,
       size,
     });
-   console.log(result);
+    console.log(result);
     return res.json(result);
-     
+
   } catch (error) {
     console.log(error);
 

@@ -5,7 +5,7 @@ import { generateAltWithAI } from "./ai.service";
 import { createGeneration } from "../repositories/generation.repository";
 
 type GenerateAltRequest = {
-buffer: Buffer;
+  buffer: Buffer;
 
   mimeType: string;
 
@@ -24,11 +24,16 @@ export async function generateAltService({
   size,
 }: GenerateAltRequest) {
   try {
-    // 1. IA
+
+    // 1. upload cloudinary
+    const imageUrl =
+      await uploadImage(buffer);
+
+    // 2. IA
     const aiResult =
       await generateAltWithAI({
-        buffer,
-        mimeType,
+        imageUrl,
+
         language,
         tone,
         size,
@@ -39,10 +44,6 @@ export async function generateAltService({
         "Failed generating ALT description"
       );
     }
-
-    // 2. upload cloudinary
-    const imageUrl =
-      await uploadImage(buffer);
 
     // 3. save db
     const generation =
@@ -66,6 +67,7 @@ export async function generateAltService({
       });
 
     return generation;
+
   } catch (error) {
     console.log(error);
 

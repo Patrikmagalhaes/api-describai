@@ -1,9 +1,7 @@
-import ai from "../lib/gemini";
+import openrouter from "../lib/openrouter";
 
 type GenerateAltAIParams = {
-    buffer: Buffer
-
-    mimeType: string;
+    imageUrl: string;
 
     language: string;
     tone: string;
@@ -23,16 +21,11 @@ export type AIResult = {
 };
 
 export async function generateAltWithAI({
-    buffer,
-    mimeType,
+    imageUrl,
     language,
     tone,
     size,
 }: GenerateAltAIParams) {
-
-
-
-
     const toneMap = {
         natural: "Use a natural and accessible tone.",
 
@@ -83,44 +76,65 @@ Rules:
 `;
 
 
+    const MODELS = [
+        "qwen/qwen2.5-vl-72b-instruct",
 
-    const base64Image =
-        buffer.toString("base64");
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        "meta-llama/llama-3.2-11b-vision-instruct",
+    ];
+    for (const model of MODELS) {
+        try {
+            const response =
+                await openrouter.chat.completions.create({
+                    model,
 
-        contents: [
-            {
-                role: "user",
+                    messages: [
+                        {
+                            role: "user",
 
-                parts: [
-                    {
-                        text: prompt,
-                    },
+                            content: [
+                                {
+                                    type: "text",
 
-                    {
-                        inlineData: {
-                            mimeType,
-                            data: base64Image,
+                                    text: prompt,
+                                },
+
+                                {
+                                    type: "image_url",
+
+                                    image_url: {
+                                        url: imageUrl,
+                                    },
+                                },
+                            ],
                         },
-                    },
-                ],
-            },
-        ],
-    });
+                    ],
+                });
 
-    const text = response.text;
+            const text =
+                response.choices[0]?.message?.content;
 
-    if (!text) {
-        throw new Error("Empty AI response");
+            if (!text) {
+                continue;
+            }
+
+            const cleanText = text
+                .replace(/```json/g, "")
+                .replace(/```/g, "")
+                .trim();
+
+            const parsed = JSON.parse(cleanText);
+
+            return parsed as AIResult;
+        } catch (error: any) {
+            console.log("MODEL:", model);
+
+            console.log(
+                error?.response?.data ||
+                error?.message ||
+                error
+            );
+        }
     }
 
-    const cleanText = text
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
-
-    const parsed = JSON.parse(cleanText);
-
-    return parsed as AIResult;
+    throw new Error("All AI models failed");
 }
